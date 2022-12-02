@@ -1,9 +1,10 @@
-import { Outlet, NavLink } from "react-router-dom"
+import { Outlet, NavLink, ScrollRestoration } from "react-router-dom"
 import Breadcrumbs from "../components/Breadcrumbs"
 
 export default function RootLayout() {
   return (
     <div className="root-layout">
+      <ScrollRestoration />
       <header>
         <nav>
           <h1>Jobarouter</h1>
