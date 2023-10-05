@@ -7,11 +7,11 @@ export default function RootLayout() {
       <ScrollRestoration />
       <header>
         <nav>
-          <h1>Jobarouter</h1>
+          <h1>BeachvolleyballCRM</h1>
           <NavLink to="/">Home</NavLink>
-          <NavLink to="about">About</NavLink>
-          <NavLink to="help">Help</NavLink>
-          <NavLink to="careers">Careers</NavLink>
+          <NavLink to="entries">Entries</NavLink>
+          <NavLink to="users">Users</NavLink>
+
         </nav>
         <Breadcrumbs />
       </header>

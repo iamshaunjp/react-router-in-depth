@@ -1,8 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
 
 :root {
-  --primary: #bc4123;
-  --secondary: #2b3452;
+  --primary: hsla(0, 0%, 100%, 0.651);
+  --secondary: #CDEDED;
 }
 body {
   margin: 0;
@@ -11,7 +11,7 @@ body {
   background: var(--secondary);
 }
 * {
-  color: #fff;
+  color: #000000;
   margin: 0;
 }
 p {
@@ -20,8 +20,9 @@ p {
 button {
   border: 0;
   padding: 8px;
+  margin-bottom: 5px;
   border-radius: 4px;
-  color: white;
+  color: rgb(0, 0, 0);
   background: var(--primary);
   cursor: pointer;
 }
@@ -104,9 +105,9 @@ form label span {
 .careers > a {
   display: block;
   background: rgba(0,0,0,0.2);
-  padding: 20px;
+  padding: 5px;
   border-radius: 4px;
-  margin: 20px 0;
+  margin: 10px 0;
   text-decoration: none;
 }
 .careers > a:hover p {
@@ -117,7 +118,7 @@ form label span {
 }
 .careers > a p:last-child {
  font-size: 0.8em;
- color: #bbb;
+ color: #b78f16;
 }
 
 /* careers details */

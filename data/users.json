@@ -1,0 +1,18 @@
+{
+    "users": [
+        {
+            "id": 1,
+            "firstName": "Kostas",
+            "lastName": "Razgkelis",
+            "phone": "6999999999",
+            "totalCost": 100
+        },
+        {
+            "id": 2,
+            "firstName": "Giorgos",
+            "lastName": "Terzoglou",
+            "phone": "6999999999",
+            "totalCost": 50
+        }
+    ]
+}

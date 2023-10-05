@@ -42,5 +42,48 @@
       "salary": 30000,
       "location": "London, UK"
     }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "firstName": "Kostas",
+      "lastName": "Razgkelis",
+      "phone": "6999999999",
+      "totalCost": 100
+    },
+    {
+      "id": 2,
+      "firstName": "Giorgos",
+      "lastName": "Terzoglou",
+      "phone": "6999999999",
+      "totalCost": 50
+    }
+  ],
+
+  "arenas": [
+    {
+      "id": 1,
+      "name": "first arena"
+    }
+  ]
+  ,
+  "games": [
+    {
+      "id": 1,
+      "arenaId": 1,
+      "users": [1, 2],
+      "timeStart": "0900",
+      "timeEnd": "1000"
+    },
+    {
+      "id": 2,
+      "arenaId": 1,
+      "users": [
+        1,
+        2
+      ],
+      "timeStart": "1000",
+      "timeEnd": "1100"
+    }
   ]
 }
