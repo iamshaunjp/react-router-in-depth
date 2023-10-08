@@ -8,17 +8,20 @@ import {
 // pages
 import Home from './pages/Home'
 import NotFound from './pages/NotFound'
-import Careers, { careersLoader } from './pages/entries/Entries'
-import CareerDetails, { careerDetailsLoader } from "./pages/entries/EntryDetails"
+import Entries from './pages/entries/Entries'
+import CareerDetails from "./pages/entries/EntryDetails"
 import CareersError from './pages/entries/CareersError'
-import Users, { usersLoader } from './pages/users/Users'
+
+import Users from './pages/users/Users'
+import UsersCreate from './pages/users/UsersCreate'
 
 
 // layouts
 import RootLayout from './layouts/RootLayout'
 import EntriesLayout from './layouts/EntriessLayout'
 import UsersLayout from './layouts/UsersLayout'
-import UserDetails, { userDetailsLoader } from './pages/users/UserDetails'
+import UserDetails from './pages/users/UserDetails'
+import { GetUsers } from './controllers/UserController'
 
 
 const router = createBrowserRouter(
@@ -28,14 +31,13 @@ const router = createBrowserRouter(
       <Route path="entries" element={<EntriesLayout />} errorElement={<CareersError />}>
         <Route 
           index 
-          element={<Careers />} 
-          loader={careersLoader}
+          element={<Entries />} 
           errorElement={<CareersError />}
         />
         <Route 
           path=":id" 
           element={<CareerDetails />}
-          loader={careerDetailsLoader}
+          loader={GetUsers}
         />
       </Route>
 
@@ -43,13 +45,16 @@ const router = createBrowserRouter(
         <Route 
           index 
           element={<Users />} 
-          loader={usersLoader}
+          loader={GetUsers}
           errorElement={<></>}
         />
+        <Route
+          path=':create-user'
+          element={<UsersCreate/>}>
+        </Route>
         <Route 
           path=":id" 
           element={<UserDetails />}
-          loader={userDetailsLoader}
         />
       </Route>
 

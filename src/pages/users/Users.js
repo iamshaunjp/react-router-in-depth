@@ -1,11 +1,29 @@
-import { Link, useLoaderData } from "react-router-dom"
+import { Link } from "react-router-dom"
+import { GetUsers } from "../../controllers/UserController";
+import { useState, useEffect, setError } from "react";
 
 export default function Users() {
-  const users = useLoaderData()
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    GetUsers()
+      .then((data) => {
+        setUsers(data);
+      })
+      .catch((error) => {
+        setError(error);
+      });
+  }, []);
 
   return (
     <div className="careers">
+      <div>
+        <Link to="/users/create-user">
+          <button>Create New User</button>
+        </Link>
+      </div>
       {users.map(user => (
+
         <Link to={user.id.toString()} key={user.id}>
           <p>{user.firstName} {user.lastName}</p>
           <p>{user.totalCost} $</p>
@@ -13,15 +31,4 @@ export default function Users() {
       ))}
     </div>
   )
-}
-
-// data loader
-export const usersLoader = async () => {
-  const res = await fetch('http://localhost:4000/users')
-
-  if (!res.ok) {
-    throw Error('Could not fetch the list of users')
-  }
-
-  return res.json()
 }
