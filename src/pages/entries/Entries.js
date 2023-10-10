@@ -1,49 +1,34 @@
 import { Link } from "react-router-dom"
-import { db } from "../../firebase"
-import React, { useEffect, useState } from "react";
-import { collection, doc, getDocs } from "firebase/firestore"
+import React, { useState, setError, useEffect } from "react";
+import { GetAllEntriesAsync } from "../../controllers/EntriesController";
 
-export default function Careers() {
-  const [items, setItems] = useState([]);
+export default function Entries() {
+  const [entries, setEntries] = useState([]);
 
   useEffect(() => {
-    // Reference to the "items" collection
-    const itemsRef = collection(db, "users");
-
-    // Fetch the collection
-    itemsRef.get().then((querySnapshot) => {
-      const data = [];
-      querySnapshot.forEach((doc) => {
-        data.push({ id: doc.id, ...doc.data() });
+    GetAllEntriesAsync()
+      .then((data) => {
+        setEntries(data);
+      })
+      .catch((error) => {
+        setError(error);
       });
-      setItems(data);
-    });
   }, []);
 
+
+  console.log(entries);
   return (
     <div className="careers">
-      {/* {entries.map(entry => (
-        <Link to={entry.id.toString()} key={entry.id}>
-          <p>Arena Name: {entry.arenaId}</p>
+      <div>
+        <Link to="/entries/create-entry">
+          <button>Create New Entry</button>
         </Link>
-      ))} */}
-
-        {items.map((item) => (
-                  <Link key={item.id}>
-                    {item.name}: {item.description}
-                  </Link>
-                ))}
+      </div>
+      {entries.map((entry) => (
+        <Link to={entry.id.toString()} key={entry.id}>
+          <p>Arena: {entry.arenaName}</p>
+        </Link>
+      ))}
     </div>
-  )
+  );
 }
-
-// // data loader
-// export const careersLoader = async () => {
-//   const res = await fetch('http://localhost:4000/games')
-
-//   if (!res.ok) {
-//     throw Error('Could not fetch the list of careers')
-//   }
-
-//   return res.json()
-// }
