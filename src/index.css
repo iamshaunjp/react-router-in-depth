@@ -165,5 +165,98 @@ form label span {
 
 .user-list-item:hover::before {
   content: '→  ';
-  /* Add a right arrow before the text */
+}
+
+/* ScheduleTable.css */
+
+.calendar-and-arena {
+  display: flex;
+  flex-direction: column; /* Change flex-direction to column */
+  align-items: center;
+  margin-bottom: 20px;
+  margin-top: 50px;
+
+}
+
+.date-container,
+.arena-container {
+  margin-bottom: 10px; /* Add margin to separate the components */
+}
+
+.date-container {
+  display: flex;
+  align-items: center;
+}
+
+.arena-container {
+  display: flex;
+  align-items: center;
+}
+
+/* Style for the label */
+.label {
+  margin-right: 10px;
+  white-space: nowrap;
+}
+
+div.ScheduleTableContainer {
+  text-align: center;
+}
+
+table.ScheduleTable {
+  background-color: #f2f2f2;
+  border-collapse: collapse;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  margin-top: 20px;
+  border: 1px solid var(--primary);
+
+}
+
+table.ScheduleTable th {
+  background-color: var(--primary);
+  border-bottom: 1px solid var(--primary);
+  padding: 10px;
+  text-align: center;
+}
+
+/* Style for table cells */
+table.ScheduleTable td {
+  border-bottom: var(--primary);
+  padding: 10px;
+}
+
+/* ScheduleTable.css */
+
+.ScheduleTableContainer {
+  text-align: center;
+  padding: 20px;
+}
+
+table.ScheduleTable tr:hover {
+  background-color: var(--primary); 
+}
+form {
+  margin-top: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+}
+
+label {
+  font-weight: bold;
+}
+
+.form-control {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  outline: none;
+  text-align: center;
 }

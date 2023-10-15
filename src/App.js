@@ -21,14 +21,15 @@ import RootLayout from "./layouts/RootLayout";
 import EntriesLayout from "./layouts/EntriesLayout";
 import UsersLayout from "./layouts/UsersLayout";
 import UserDetails from "./pages/users/UserDetails";
-import { GetUsers } from "./controllers/UserController";
-import { GetAllEntriesAsync } from "./controllers/EntriesController";
+import ScheduleTable from "./pages/scheduleTable/ScheduleTable";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<RootLayout />}>
       <Route index element={<Home />} />
-
+      <Route path="schedule" errorElement={<Error />}>
+        <Route index element={<ScheduleTable />} errorElement={<Error />} />
+      </Route>
       <Route
         path="entries"
         element={<EntriesLayout />}
@@ -36,20 +37,11 @@ const router = createBrowserRouter(
       >
         <Route index element={<Entries />} errorElement={<Error />} />
         <Route path=":create-entry" element={<EntriesCreate />}></Route>
-        <Route
-          path=":id"
-          element={<EntriesDetails />}
-          loader={GetAllEntriesAsync}
-        />
+        <Route path=":id" element={<EntriesDetails />} />
       </Route>
 
       <Route path="users" element={<UsersLayout />} errorElement={<Error />}>
-        <Route
-          index
-          element={<Users />}
-          loader={GetUsers}
-          errorElement={<></>}
-        />
+        <Route index element={<Users />} errorElement={<></>} />
         <Route path=":create-user" element={<UsersCreate />}></Route>
         <Route path=":id" element={<UserDetails />} />
       </Route>

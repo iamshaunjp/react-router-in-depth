@@ -6,21 +6,23 @@ import {
   deleteDoc,
   updateDoc,
   addDoc,
+  query,
+  where,
 } from "firebase/firestore";
-import { db } from "../firebase";
+import { db, entriesCollection } from "../firebase";
+import { Entries } from "../entities/EntriesEntity";
 
 const collectionName = "entries";
 
 export async function GetAllEntriesAsync() {
-  const itemsRef = collection(db, collectionName);
-
   try {
-    const querySnapshot = await getDocs(itemsRef);
+    const querySnapshot = await getDocs(entriesCollection);
     const data = [];
 
     querySnapshot.forEach((doc) => {
       data.push({ id: doc.id, ...doc.data() });
     });
+
     return data;
   } catch (error) {
     console.error("Error fetching Entries:", error);
@@ -29,7 +31,7 @@ export async function GetAllEntriesAsync() {
 }
 
 export async function GetEntryByIdAsync(id) {
-  const userRef = doc(db, collectionName, id); // Replace "users" with your Firestore collection name
+  const userRef = doc(db, collectionName, id);
 
   try {
     const userDoc = await getDoc(userRef);
@@ -38,11 +40,39 @@ export async function GetEntryByIdAsync(id) {
       const data = { id: userDoc.id, ...userDoc.data() };
       return data;
     } else {
-      // User document not found, return null or handle accordingly
       return null;
     }
   } catch (error) {
     console.error("Error fetching entry:", error);
+    throw error;
+  }
+}
+
+export async function GetAllEntriesFromDateAndArenaAsyc(arena, datetime) {
+  try {
+    const q = query(
+      entriesCollection,
+      where("arena", "==", doc(db, "arenas", arena.id)),
+      where(
+        "datetime",
+        ">=",
+        new Date(datetime.setHours(0, 0, 0, 0)),
+        where("datetime", "<", new Date(datetime.setHours(23, 59, 59, 999)))
+      )
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    const entries = [];
+    querySnapshot.forEach((doc) => {
+      const entryData = doc.data();
+      const entry = new Entries({ id: doc.id, ...entryData });
+      entries.push(entry);
+    });
+
+    return entries;
+  } catch (error) {
+    console.error("Error fetching Entries:", error);
     throw error;
   }
 }
@@ -66,7 +96,7 @@ export async function UpdateEntryAsync(id, queryData) {
     console.log("User data updated successfully");
   } catch (error) {
     console.error("Error updating entry data:", error);
-    throw error; // You can handle the error in your component
+    throw error;
   }
 }
 
@@ -76,9 +106,9 @@ export async function CreateEntryAsync(queryData) {
     const newDocRef = addDoc(dataDocRef, queryData);
 
     console.log("User created successfully with ID: ", newDocRef.id);
-    return newDocRef.id; // Return the ID of the newly created user document
+    return newDocRef.id;
   } catch (error) {
     console.error("Error creating ${}: ", error);
-    throw error; // You can handle the error in your component
+    throw error;
   }
 }

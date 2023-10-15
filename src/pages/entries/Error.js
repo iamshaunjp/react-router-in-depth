@@ -1,7 +1,7 @@
-import { Link, useRouteError } from "react-router-dom"
+import { Link, useRouteError } from "react-router-dom";
 
 export default function Error() {
-  const error = useRouteError()
+  const error = useRouteError();
 
   return (
     <div className="careers-error">
@@ -9,5 +9,5 @@ export default function Error() {
       <p>{error.message}</p>
       <Link to="/">Back to the Homepage</Link>
     </div>
-  )
+  );
 }

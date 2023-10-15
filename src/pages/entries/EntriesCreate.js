@@ -9,7 +9,7 @@ export default function EntriesCreate() {
   const initialEntryState = {
     arenaName: "",
     users: [""],
-    timeRange: "",
+    datetime: "",
   };
 
   const [entry, setEntry] = useState(initialEntryState);
@@ -115,12 +115,12 @@ export default function EntriesCreate() {
           />
         </div>
         <div style={{ marginBottom: "50px" }}>
-          <label htmlFor="timeRange">Time Range</label>
+          <label htmlFor="datetime">Time Range</label>
           <input
             type="text"
-            id="timeRange"
-            name="timeRange"
-            value={entry.timeRange}
+            id="datetime"
+            name="datetime"
+            value={entry.datetime}
             onChange={handleInputChange}
             required
           />

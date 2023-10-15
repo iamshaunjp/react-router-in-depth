@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom"
+import { Link } from "react-router-dom";
 import React, { useState, setError, useEffect } from "react";
 import { GetAllEntriesAsync } from "../../controllers/EntriesController";
 
@@ -15,8 +15,6 @@ export default function Entries() {
       });
   }, []);
 
-
-  console.log(entries);
   return (
     <div className="careers">
       <div>
