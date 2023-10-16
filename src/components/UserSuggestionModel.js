@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import Modal from "react-modal";
 
 Modal.setAppElement("#root"); // Set the root element for the modal
@@ -18,6 +18,15 @@ export default function UserSuggestionsModal({
   selectedUserIndex,
   setSelectedUserIndex,
 }) {
+
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredUsers = existingUsers.filter(
+    (user) =>
+      user.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.lastName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  
   return (
     <Modal
       isOpen={isOpen}
@@ -25,8 +34,14 @@ export default function UserSuggestionsModal({
       contentLabel="User Suggestions Modal"
       style={customStyles}
     >
+      <input
+        type="text"
+        placeholder="Search Users"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+      />
       <ul>
-        {existingUsers.map((existingUser, index) => (
+        {filteredUsers.map((existingUser, index) => (
           <li
             key={index}
             onClick={() => handleUserClick(existingUser)}

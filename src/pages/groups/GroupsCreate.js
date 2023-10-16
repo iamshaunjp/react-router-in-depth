@@ -1,22 +1,16 @@
 import React, { useState, useEffect, setError } from "react";
-import { CreateEntryAsync } from "../../controllers/EntriesController";
+import { CreateGroupAsync } from "../../controllers/GroupsController";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { GetUsers } from "../../controllers/UserController";
 import UserSuggestionsModal from "../../components/UserSuggestionModel";
+import { GetUsers } from "../../controllers/UserController";
 
-export default function EntriesCreate() {
-  const initialEntryState = {
-    arenaName: "",
-    users: [""],
-    datetime: "",
-  };
-
-  const [entry, setEntry] = useState(initialEntryState);
+export default function UsersCreate() {
   const [existingUsers, setExistingUsers] = useState([]);
   const [isUserModalOpen, setUserModalOpen] = useState(false);
   const [selectedUserIndex, setSelectedUserIndex] = useState(null);
-  const [selectedUsers, setSelectedUsers] = useState([]); // Initialize an empty array to store selected users
+  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [groupName, setGroupName] = useState("");
 
   useEffect(() => {
     GetUsers()
@@ -28,59 +22,53 @@ export default function EntriesCreate() {
       });
   }, []);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setEntry({ ...entry, [name]: value });
-  };
-
   const handleUserClick = (selectedUser) => {
     setSelectedUsers((prevSelectedUsers) => [
       ...prevSelectedUsers,
-      {
-        firstName: selectedUser.firstName,
-        lastName: selectedUser.lastName,
-        id: selectedUser.id,
-      },
+      selectedUser,
     ]);
-    setUserModalOpen(false);
+
     console.log(selectedUsers);
+    setUserModalOpen(false);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "groupName") {
+      setGroupName(value);
+    } else if (name === "users") {
+      setSelectedUsers(value);
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    CreateEntryAsync(entry)
-      .then(() => {
-        toast.success("User created successfully", {
-          autoClose: 15000,
-        });
-        setEntry(initialEntryState); // Reset the form after successful submission
-      })
-      .catch((error) => {
-        toast.error(`Error: ${error.message}`);
-      });
+    const group = { name: groupName, users: selectedUsers };
+    CreateGroupAsync(group);
+
+    toast.success("Group created successfully", {
+      autoClose: 15000,
+    });
+
+    setGroupName("");
+    setSelectedUsers([]);
   };
 
   return (
-    <div>
-      <h2>Create New Entry</h2>
+    <div className="careers">
+      <h1>Create a New Group</h1>
       <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: "50px" }}>
-          <label htmlFor="arenaName">Arena Name</label>
-          <br />
-          <select
-            id="arenaName"
-            name="arenaName"
-            value={entry.arenaName}
+        <div>
+          <label htmlFor="bane">Name:</label>
+          <input
+            type="text"
+            id="groupName"
+            name="groupName"
+            value={groupName}
             onChange={handleInputChange}
             required
-          >
-            <option value="">Select an Arena</option>
-            <option value="Arena 1">Arena 1</option>
-            <option value="Arena 2">Arena 2</option>
-            <option value="Arena 3">Arena 3</option>
-          </select>
+          />
         </div>
-
         <div style={{ marginBottom: "50px" }}>
           <label htmlFor="users">Users</label>
           <div style={{ marginBottom: "20px" }}>
@@ -88,7 +76,9 @@ export default function EntriesCreate() {
               type="text"
               id="users"
               name="users"
-              value={selectedUsers}
+              value={selectedUsers
+                .map((user) => user.firstName + " " + user.lastName)
+                .join(", ")}
               onChange={handleInputChange}
               onClick={() => setUserModalOpen(true)} // Open the modal on click
               required
@@ -114,18 +104,9 @@ export default function EntriesCreate() {
             setSelectedUserIndex={setSelectedUserIndex}
           />
         </div>
-        <div style={{ marginBottom: "50px" }}>
-          <label htmlFor="datetime">Time Range</label>
-          <input
-            type="text"
-            id="datetime"
-            name="datetime"
-            value={entry.datetime}
-            onChange={handleInputChange}
-            required
-          />
+        <div>
+          <button type="submit">Create Group</button>
         </div>
-        <button type="submit">Create Entry</button>
       </form>
     </div>
   );

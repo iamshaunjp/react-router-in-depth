@@ -11,10 +11,10 @@ import NotFound from "./pages/NotFound";
 import Entries from "./pages/entries/Entries";
 import EntriesDetails from "./pages/entries/EntryDetails";
 import Error from "./pages/entries/Error";
-
 import Users from "./pages/users/Users";
 import UsersCreate from "./pages/users/UsersCreate";
 import EntriesCreate from "./pages/entries/EntriesCreate";
+import Groups from "./pages/groups/Groups";
 
 // layouts
 import RootLayout from "./layouts/RootLayout";
@@ -22,6 +22,9 @@ import EntriesLayout from "./layouts/EntriesLayout";
 import UsersLayout from "./layouts/UsersLayout";
 import UserDetails from "./pages/users/UserDetails";
 import ScheduleTable from "./pages/scheduleTable/ScheduleTable";
+import GroupsLayout from "./layouts/GroupsLayout";
+import GroupsCreate from "./pages/groups/GroupsCreate";
+import GroupDetails from "./pages/groups/GroupDetails";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -39,7 +42,11 @@ const router = createBrowserRouter(
         <Route path=":create-entry" element={<EntriesCreate />}></Route>
         <Route path=":id" element={<EntriesDetails />} />
       </Route>
-
+      <Route path="groups" element={<GroupsLayout />} errorElement={<Error />}>
+        <Route index element={<Groups />} errorElement={<></>} />
+        <Route path=":create-group" element={<GroupsCreate />}></Route>
+        <Route path=":id" element={<GroupDetails />} />
+      </Route>
       <Route path="users" element={<UsersLayout />} errorElement={<Error />}>
         <Route index element={<Users />} errorElement={<></>} />
         <Route path=":create-user" element={<UsersCreate />}></Route>

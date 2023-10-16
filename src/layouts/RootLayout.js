@@ -11,6 +11,7 @@ export default function RootLayout() {
           <NavLink to="/">Home</NavLink>
           <NavLink to="schedule">Schedule</NavLink>
           <NavLink to="entries">Entries</NavLink>
+          <NavLink to="groups">Groups</NavLink>
           <NavLink to="users">Users</NavLink>
         </nav>
         <Breadcrumbs />
