@@ -1,4 +1,4 @@
-import { collection, getDocs, getDoc, addDoc, doc, updateDoc} from "firebase/firestore";
+import { collection, getDocs, getDoc, addDoc, doc, updateDoc, arrayUnion, deleteDoc} from "firebase/firestore";
 import { db, groupCollection } from "../firebase";
 import { Group } from "../entities/GroupEntity";
 
@@ -40,22 +40,35 @@ export async function GetGroupByIdAsync(id) {
 
 export async function CreateGroupAsync(groupData) {
   try {
-    console.log(groupData.name)
-
-    const groupDocRef = await addDoc(groupCollection, {"name": groupData.name});
-
-    const userRefs = await groupData.users.map((userId) => doc(db, 'users', userId));
-
-    console.log(userRefs)
-    if (userRefs.exists)
-    {
-      await updateDoc(groupDocRef, { users: userRefs });
-    }
-
-    return groupDocRef.id;
+    const groupDocRef = await addDoc(groupCollection, {name: groupData.name});
+    console.log("Group created with id: " + groupDocRef.id);
+    return groupDocRef;
   } catch (error) {
     console.error("Error creating user: ", error);
     throw error;
+  }
+}
+
+export async function UpdateGroupAsync(id, groupData) {
+  try {
+      const groupDocRef = doc(db, "users", id);
+      await updateDoc(groupDocRef, groupData);
+      console.log('User data updated successfully');
+  } catch (error) {
+      console.error('Error updating user data:', error);
+      throw error; // You can handle the error in your component
+  }
+}
+
+
+export async function DeleteGroupAsync(id) {
+  const userRef = doc(db, "groups", id);
+  try {
+      await deleteDoc(userRef);
+      console.log("Group deleted successfully");
+  } catch (error) {
+      console.error("Error deleting user:", error);
+      throw error;
   }
 }
 
@@ -73,5 +86,20 @@ export async function GetRefGroupAsync(ref) {
   } catch (error) {
     console.error("Error fetching referenced document:", error);
     return null;
+  }
+}
+
+export async function AddUserToGroup(groupId, userId) {
+  try {
+    const groupDocRef = doc(db, collectionName, groupId);
+    const userRef = doc(db, 'users', userId);
+
+    // Add the user reference to the group's 'users' field using arrayUnion
+    await updateDoc(groupDocRef, { users: arrayUnion(userRef) });
+
+    console.log('User added to group successfully');
+  } catch (error) {
+    console.error('Error adding user to group:', error);
+    throw error;
   }
 }

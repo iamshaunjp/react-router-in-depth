@@ -21,7 +21,7 @@ export async function GetUsers() {
 }
 
 export async function GetUser(id) {
-    const userRef = doc(db, 'user', id); // Replace "users" with your Firestore collection name
+    const userRef = doc(db, 'users', id); // Replace "users" with your Firestore collection name
   
     try {
       const userDoc = await getDoc(userRef);
@@ -37,7 +37,7 @@ export async function GetUser(id) {
   }
 
 export async function DeleteUser(id) {
-    const userRef = doc(db, "user", id);
+    const userRef = doc(db, "users", id);
     try {
         await deleteDoc(userRef);
         console.log("User deleted successfully");
@@ -49,7 +49,7 @@ export async function DeleteUser(id) {
 
 export async function UpdateUser(id, userData) {
     try {
-        const userDocRef = doc(db, "user", id);
+        const userDocRef = doc(db, "users", id);
         await updateDoc(userDocRef, userData);
         console.log('User data updated successfully');
     } catch (error) {
@@ -68,3 +68,20 @@ export async function CreateUser(userData) {
         throw error; // You can handle the error in your component
     }
 }
+
+
+export async function GetRefUserAsync(ref) {
+    try {
+      const docSnapshot = await getDoc(ref);
+      if (docSnapshot.exists()) {
+        return docSnapshot;
+      } else {
+        console.log("Referenced document does not exist.");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error fetching referenced document:", error);
+      return null;
+    }
+  }
+  

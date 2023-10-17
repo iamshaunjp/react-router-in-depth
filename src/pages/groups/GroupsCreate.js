@@ -1,11 +1,12 @@
-import React, { useState, useEffect, setError } from "react";
-import { CreateGroupAsync } from "../../controllers/GroupsController";
+import React, { useState, useEffect, setError, useParams } from "react";
+import { CreateGroupAsync, AddUserToGroup, GetGroupByIdAsync } from "../../controllers/GroupsController";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import UserSuggestionsModal from "../../components/UserSuggestionModel";
 import { GetUsers } from "../../controllers/UserController";
 
-export default function UsersCreate() {
+export default function GroupCreate() {
+
   const [existingUsers, setExistingUsers] = useState([]);
   const [isUserModalOpen, setUserModalOpen] = useState(false);
   const [selectedUserIndex, setSelectedUserIndex] = useState(null);
@@ -27,8 +28,6 @@ export default function UsersCreate() {
       ...prevSelectedUsers,
       selectedUser,
     ]);
-
-    console.log(selectedUsers);
     setUserModalOpen(false);
   };
 
@@ -37,15 +36,21 @@ export default function UsersCreate() {
     if (name === "groupName") {
       setGroupName(value);
     } else if (name === "users") {
-      setSelectedUsers(value);
+      selectedUsers(value)
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const group = { name: groupName, users: selectedUsers };
-    CreateGroupAsync(group);
-
+    const groupRef = await CreateGroupAsync(group);
+    
+    if (groupRef) {
+      for (const userId of selectedUsers) {
+        await AddUserToGroup(groupRef.id, userId.id);
+      }
+    }
+    
     toast.success("Group created successfully", {
       autoClose: 15000,
     });
@@ -59,7 +64,7 @@ export default function UsersCreate() {
       <h1>Create a New Group</h1>
       <form onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="bane">Name:</label>
+          <label htmlFor="groupName">Name:</label>
           <input
             type="text"
             id="groupName"
@@ -80,17 +85,15 @@ export default function UsersCreate() {
                 .map((user) => user.firstName + " " + user.lastName)
                 .join(", ")}
               onChange={handleInputChange}
-              onClick={() => setUserModalOpen(true)} // Open the modal on click
+              onClick={() => setUserModalOpen(true)}
               required
             />
             <button
               type="button"
               onClick={() => setSelectedUsers([])}
-              style={{
-                cursor: "pointer",
-              }}
+              style={{ cursor: "pointer" }}
             >
-              Clean Data
+              Clear Users
             </button>
           </div>
         </div>

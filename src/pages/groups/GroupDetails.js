@@ -1,11 +1,14 @@
-import { useParams, useNavigate } from 'react-router-dom';
-import { DeleteUser, GetUser, UpdateUser } from '../../controllers/UserController';
-import { useEffect, useState, setError } from 'react';
-import { GetGroupByIdAsync } from '../../controllers/GroupsController';
+import { useParams, useNavigate } from "react-router-dom";
+import { UpdateUser } from "../../controllers/UserController";
+import { useEffect, useState, setError } from "react";
+import {
+  GetGroupByIdAsync,
+  DeleteGroupAsync,
+} from "../../controllers/GroupsController";
 
-export default function GroupDetails({ }) {
+export default function GroupDetails({}) {
   const { id } = useParams();
-  const [group, setGroup] = useState(null); // Initialize user as null or an initial value
+  const [group, setGroup] = useState([]); // Initialize user as null or an initial value
   const [isEditing, setIsEditing] = useState(false);
   const navigate = useNavigate();
 
@@ -28,7 +31,7 @@ export default function GroupDetails({ }) {
       await UpdateUser(id, group);
       setIsEditing(false);
     } catch (error) {
-      console.error('Error updating user data:', error);
+      console.error("Error updating user data:", error);
     }
   };
 
@@ -37,16 +40,15 @@ export default function GroupDetails({ }) {
     setGroup({ ...group, [name]: value });
   };
 
-  const handleDeleteClick = () => {
 
+  const handleDeleteClick = async () => {
     try {
-      DeleteUser(id);
-      navigate('/groups');
+      await DeleteGroupAsync(id);
+      navigate("/groups");
     } catch (error) {
       console.error(error);
     }
-  }
-
+  };
 
   return (
     <div className="career-details">
@@ -55,7 +57,7 @@ export default function GroupDetails({ }) {
           {isEditing ? (
             <div>
               <div>
-                <label style={{ marginRight: '10px' }}>Group Name:</label>
+                <label style={{ marginRight: "10px" }}>Group Name:</label>
                 <input
                   type="text"
                   name="name"
@@ -63,16 +65,26 @@ export default function GroupDetails({ }) {
                   onChange={handleInputChange}
                 />
               </div>
-              <button onClick={handleSaveClick} style={{ marginLeft: '10px', marginTop: '10px' }}>
+              <button
+                onClick={handleSaveClick}
+                style={{ marginLeft: "10px", marginTop: "10px" }}
+              >
                 Save
               </button>
             </div>
           ) : (
             <div>
               <div>
-                <p><strong>Group Name:</strong> {group.name}</p>
+                <p>
+                  <strong>Group Name:</strong> {group.name}
+                </p>
               </div>
-              <button onClick={handleEditClick} style={{ marginRight: '10px' }}>
+              <div>
+                <p>
+                  <strong>Users:</strong>
+                </p>
+              </div>
+              <button onClick={handleEditClick} style={{ marginRight: "10px" }}>
                 Edit
               </button>
               <button onClick={handleDeleteClick}>Delete</button>
@@ -84,6 +96,4 @@ export default function GroupDetails({ }) {
       )}
     </div>
   );
-
 }
-

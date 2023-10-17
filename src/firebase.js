@@ -24,6 +24,6 @@ export const db = getFirestore(app);
 export const arenasCollection = collection(db, "arenas");
 export const entriesCollection = collection(db, "entries");
 export const groupCollection = collection(db, "groups");
-export const userCollection = collection(db, "user");
+export const userCollection = collection(db, "users");
 
 
