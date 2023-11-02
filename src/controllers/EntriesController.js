@@ -53,12 +53,8 @@ export async function GetAllEntriesFromDateAndArenaAsyc(arena, datetime) {
     const q = query(
       entriesCollection,
       where("arena", "==", doc(db, "arenas", arena.id)),
-      where(
-        "datetime",
-        ">=",
-        new Date(datetime.setHours(0, 0, 0, 0)),
-        where("datetime", "<", new Date(datetime.setHours(23, 59, 59, 999)))
-      )
+      where("datetime", ">=", new Date(datetime.setHours(0, 0, 0, 0)),
+      where("datetime", "<", new Date(datetime.setHours(23, 59, 59, 999))))
     );
 
     const querySnapshot = await getDocs(q);
@@ -69,7 +65,6 @@ export async function GetAllEntriesFromDateAndArenaAsyc(arena, datetime) {
       const entry = new Entries({ id: doc.id, ...entryData });
       entries.push(entry);
     });
-
     return entries;
   } catch (error) {
     console.error("Error fetching Entries:", error);

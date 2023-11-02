@@ -15,7 +15,7 @@ export async function GetAllArenasAsync() {
   }
 }
 
-export async function getRefArenaAsync(ref) {
+export async function GetRefArenaAsync(ref) {
   try {
     const docSnapshot = await getDoc(ref);
     if (docSnapshot.exists()) {
