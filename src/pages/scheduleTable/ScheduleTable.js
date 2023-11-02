@@ -4,22 +4,23 @@ import "react-datepicker/dist/react-datepicker.css";
 import { GetAllArenasAsync } from "../../controllers/ArenasController";
 import { GetAllEntriesFromDateAndArenaAsyc } from "../../controllers/EntriesController";
 import { GetRefGroupAsync } from "../../controllers/GroupsController";
-import { getRefArenaAsync } from "../../controllers/ArenasController";
+import { GetRefArenaAsync } from "../../controllers/ArenasController";
 import { Entries } from "../../entities/EntriesEntity";
+import AddGroupModal from "../../components/GroupPopUpBox";
+import HoursEnum from "../../enums/TimeScheduleEnum";
 
 const ScheduleTable = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedTime, setSelectedTime] = useState("");
   const [fetchArena, setFetchArena] = useState([]);
   const [selectedArena, setSelectedArena] = useState("");
   const [entries, setEntries] = useState([]);
-
-  const openingHour = 8;
-  const closingHour = 22;
+  const [isAddGroupModalOpen, setIsAddGroupModalOpen] = useState(false);
 
   const timeSlots = Array.from(
-    { length: closingHour - openingHour + 1 },
+    { length: HoursEnum.HOUR_23 - HoursEnum.HOUR_9 + 1 },
     (_, index) => {
-      const hour = openingHour + index;
+      const hour = HoursEnum.HOUR_9 + index;
       const timestamp = new Date(selectedDate);
       timestamp.setHours(hour, 0, 0, 0); // Set the hours and clear minutes, seconds, and milliseconds
       return timestamp;
@@ -40,7 +41,7 @@ const ScheduleTable = () => {
     GetAllEntriesFromDateAndArenaAsyc(selectedArena, selectedDate)
       .then((entriesSnap) => {
         const promises = entriesSnap.map(async (data) => {
-          const referencedArena = await getRefArenaAsync(data.arena);
+          const referencedArena = await GetRefArenaAsync(data.arena);
           const referencedGroup = await GetRefGroupAsync(data.group);
 
           return new Entries({
@@ -62,7 +63,7 @@ const ScheduleTable = () => {
       .catch((error) => {
         setError(error);
       });
-  }, [selectedArena, selectedDate]);
+  }, [selectedArena, selectedDate, entries]);
 
   const handleArenaChange = (e) => {
     const selectedArenaName = e.target.value;
@@ -76,8 +77,9 @@ const ScheduleTable = () => {
     setSelectedDate(date);
   };
 
-  const handleRowClick = (rowData) => {
-    console.log("Row clicked:", rowData);
+  const handleRowClick = (timeSlot) => {
+    setSelectedTime(timeSlot)
+    setIsAddGroupModalOpen(true);
   };
 
   return (
@@ -136,12 +138,7 @@ const ScheduleTable = () => {
                 );
 
                 return (
-                  <tr
-                    key={index}
-                    onClick={() =>
-                      handleRowClick(matchingEntry ? matchingEntry : "")
-                    }
-                  >
+                  <tr key={index} onClick={() => handleRowClick(timeSlot)}>
                     <td>
                       {timeSlot.toLocaleTimeString("en-US", {
                         hour: "2-digit",
@@ -156,7 +153,16 @@ const ScheduleTable = () => {
           </table>
         </div>
       </div>
+
+      <AddGroupModal
+        isOpen={isAddGroupModalOpen}
+        onRequestClose={() => setIsAddGroupModalOpen(false)}
+        arena={selectedArena}
+        time={selectedTime}
+      />
     </div>
+
+
   );
 };
 

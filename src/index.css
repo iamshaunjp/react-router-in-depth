@@ -260,3 +260,24 @@ label {
   outline: none;
   text-align: center;
 }
+
+.suggestions {
+  list-style: none;
+  padding-top: 0;
+  margin: 0;
+  border: 1px solid var(--secondary);
+  border-radius: 8px;
+  box-shadow: 2px 2px 4px #aaa;
+  background-color: white;
+  max-height: 150px; /* Add a max height or specify the desired height */
+  overflow-y: auto; /* Add a vertical scroll if the content exceeds the max height */
+}
+
+.suggestions li {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.suggestions li:hover {
+  background-color: var(--primary); /* Change background color on hover */
+}

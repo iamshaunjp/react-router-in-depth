@@ -94,7 +94,6 @@ export async function AddUserToGroup(groupId, userId) {
     const groupDocRef = doc(db, collectionName, groupId);
     const userRef = doc(db, 'users', userId);
 
-    // Add the user reference to the group's 'users' field using arrayUnion
     await updateDoc(groupDocRef, { users: arrayUnion(userRef) });
 
     console.log('User added to group successfully');
