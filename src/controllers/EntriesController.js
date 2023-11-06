@@ -10,7 +10,12 @@ import {
   where,
 } from "firebase/firestore";
 import { db, entriesCollection } from "../firebase";
+
 import { Entries } from "../entities/EntriesEntity";
+import { GetRefUserAsync } from "./UserController";
+import { GetGroupByIdAsync } from "./GroupsController";
+import { CreateAbsenceAsync } from "./AbsenceController";
+
 
 const collectionName = "entries";
 
@@ -97,11 +102,30 @@ export async function UpdateEntryAsync(id, queryData) {
 
 export async function CreateEntryAsync(queryData) {
   try {
+    const group = await GetGroupByIdAsync(queryData.group);
+
+    const absenceData = await Promise.all(group.users.map(async (user) => {
+      const userDoc = await GetRefUserAsync(user);
+      return {
+        user: doc(db, "users", userDoc.id),
+        absence: false,
+      };
+    }));
+
+    console.log(absenceData);
+
+    const absenceRef = await CreateAbsenceAsync(absenceData);
+
+    queryData.group = {
+      group: queryData.group,
+      absence: absenceRef
+    }
+
     const dataDocRef = collection(db, collectionName);
     const newDocRef = addDoc(dataDocRef, queryData);
 
-    console.log("User created successfully with ID: ", newDocRef.id);
-    return newDocRef.id;
+    console.log("Entry created successfully.");
+    return newDocRef;
   } catch (error) {
     console.error("Error creating ${}: ", error);
     throw error;

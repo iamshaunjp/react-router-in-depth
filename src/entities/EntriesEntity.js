@@ -6,3 +6,5 @@ export class Entries {
     this.datetime = datetime;
   }
 }
+
+

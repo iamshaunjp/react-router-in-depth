@@ -9,12 +9,16 @@ import { Entries } from "../../entities/EntriesEntity";
 import AddGroupModal from "../../components/GroupPopUpBox";
 import HoursEnum from "../../enums/TimeScheduleEnum";
 
+import { Arena } from "../../objectDTOs/ArenasDto";
+
+
 const ScheduleTable = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState("");
   const [fetchArena, setFetchArena] = useState([]);
   const [selectedArena, setSelectedArena] = useState("");
   const [entries, setEntries] = useState([]);
+  const [selectedEntry, setSelectedEntry] = useState();
   const [isAddGroupModalOpen, setIsAddGroupModalOpen] = useState(false);
 
   const timeSlots = Array.from(
@@ -33,37 +37,32 @@ const ScheduleTable = () => {
         setFetchArena(data);
       })
       .catch((error) => {
+        setFetchArena([new Arena('1', 'BlueArena')])
         setError(error);
       });
   }, []);
 
   useEffect(() => {
-    GetAllEntriesFromDateAndArenaAsyc(selectedArena, selectedDate)
-      .then((entriesSnap) => {
-        const promises = entriesSnap.map(async (data) => {
-          const referencedArena = await GetRefArenaAsync(data.arena);
-          const referencedGroup = await GetRefGroupAsync(data.group);
+    const fetchEntries = async () => {
+      try {
+        const entriesSnap = await GetAllEntriesFromDateAndArenaAsyc(
+          selectedArena,
+          selectedDate
+        );
 
-          return new Entries({
-            id: data.id,
-            arena: referencedArena,
-            group: referencedGroup,
-            datetime: data.datetime,
-          });
+        const promises = entriesSnap.map(async (data) => {
+          return data;
         });
 
-        Promise.all(promises)
-          .then((results) => {
-            setEntries(results);
-          })
-          .catch((error) => {
-            setError(error);
-          });
-      })
-      .catch((error) => {
+        const results = await Promise.all(promises);
+        setEntries(results);
+      } catch (error) {
         setError(error);
-      });
-  }, [selectedArena, selectedDate, entries]);
+      }
+    };
+
+    fetchEntries();
+  }, [selectedArena, selectedDate]);
 
   const handleArenaChange = (e) => {
     const selectedArenaName = e.target.value;
@@ -77,8 +76,9 @@ const ScheduleTable = () => {
     setSelectedDate(date);
   };
 
-  const handleRowClick = (timeSlot) => {
-    setSelectedTime(timeSlot)
+  const handleRowClick = (timeSlot, matchingEntry) => {
+    setSelectedTime(timeSlot);
+    setSelectedEntry(matchingEntry);
     setIsAddGroupModalOpen(true);
   };
 
@@ -110,8 +110,6 @@ const ScheduleTable = () => {
               value={selectedArena ? selectedArena.name : ""}
               onChange={handleArenaChange}
             >
-              <option value="">Select an Arena</option>
-
               {fetchArena.map((arena) => (
                 <option key={arena.id} value={arena.name}>
                   {" "}
@@ -135,10 +133,9 @@ const ScheduleTable = () => {
                   (item) =>
                     item.datetime.toDate().getHours() ===
                     new Date(timeSlot).getHours()
-                );
-
+                    );
                 return (
-                  <tr key={index} onClick={() => handleRowClick(timeSlot)}>
+                  <tr key={index} onClick={() => handleRowClick(timeSlot, matchingEntry)}>
                     <td>
                       {timeSlot.toLocaleTimeString("en-US", {
                         hour: "2-digit",
@@ -159,6 +156,7 @@ const ScheduleTable = () => {
         onRequestClose={() => setIsAddGroupModalOpen(false)}
         arena={selectedArena}
         time={selectedTime}
+        entry={selectedEntry}
       />
     </div>
 

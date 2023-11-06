@@ -9,6 +9,7 @@ export default function Groups() {
     GetAllGroupsAsync()
       .then((data) => {
         setGroups(data);
+        console.log(data)
       })
       .catch((error) => {
         setError(error);

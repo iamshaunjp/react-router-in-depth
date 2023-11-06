@@ -1,9 +1,14 @@
 import React, { useState, useEffect, setError } from "react";
 import Modal from "react-modal";
 import { GetAllGroupsAsync } from "../controllers/GroupsController";
-import { CreateEntryAsync } from "../controllers/EntriesController";
+import {
+  CreateEntryAsync,
+  DeleteEntryAsync,
+  UpdateEntryAsync,
+} from "../controllers/EntriesController";
 import { db } from "../firebase";
 import { doc } from "firebase/firestore";
+import {Entries} from "../entities/EntriesEntity";
 
 const customStyles = {
   content: {
@@ -23,12 +28,30 @@ const customStyles = {
   },
 };
 
-const AddGroupModal = ({ isOpen, onRequestClose, arena, time }) => {
+function Switch({ checked, onChange }) {
+  return (
+    <label className="switch">
+      <input type="checkbox" checked={checked} onChange={onChange} />
+      <span className="slider round"></span>
+    </label>
+  );
+}
+
+const AddGroupModal = ({ isOpen, onRequestClose, arena, time, entry }) => {
   const [groups, setGroups] = useState([]);
   const [groupSuggestions, setGroupSuggestions] = useState([]);
   const [inputText, setInputText] = useState("");
-  const [selectedGroup, setSelectedGroup] = useState("");
-  const [selectedOption, setSelectedOption] = useState(""); // New state for selected option
+  const [selectedGroup, setSelectedGroup] = useState();
+  const [selectedOption, setSelectedOption] = useState("");
+  const [selectedEntry, setSelectedEntry] = useState();
+
+  useEffect(() => {
+    if (entry) {
+      setSelectedEntry({ ...entry });
+    } else {
+      setSelectedEntry(null);
+    }
+  }, [entry]);
 
   useEffect(() => {
     GetAllGroupsAsync()
@@ -38,7 +61,7 @@ const AddGroupModal = ({ isOpen, onRequestClose, arena, time }) => {
       .catch((error) => {
         setError(error);
       });
-  }, [groups]);
+  }, []);
 
   const handleGroupInputChange = (e) => {
     const inputText = e.target.value;
@@ -64,7 +87,36 @@ const AddGroupModal = ({ isOpen, onRequestClose, arena, time }) => {
     setSelectedOption(option);
   };
 
-  const handleAddGroup = () => {
+  const handleEditEntry = () => {};
+
+  const handleDeleteEntry = (id) => {
+    DeleteEntryAsync(id);
+    onRequestClose();
+  };
+
+  const handleToggleSwitch = async (index) => {
+    const updatedEntry = { ...selectedEntry };
+    updatedEntry.group.users[index].absence = !updatedEntry.group.users[index].absence;
+  
+    const entryId = selectedEntry.id;
+  
+    const updatedData = {
+        group: {
+          users: updatedEntry.group.users,
+        },
+      };
+  
+    try {
+      await UpdateEntryAsync(entryId, updatedData); 
+      setSelectedEntry(updatedEntry);
+      console.log("Database updated successfully");
+    } catch (error) {
+      console.error("Error updating the database:", error);
+    }
+  };
+  
+
+  const handleOpenEntry = () => {
     Promise.all([
       doc(db, "groups", selectedGroup.id),
       doc(db, "arenas", arena.id),
@@ -88,28 +140,57 @@ const AddGroupModal = ({ isOpen, onRequestClose, arena, time }) => {
       contentLabel="Add Group Modal"
       style={customStyles}
     >
-      <h2>Add Group</h2>
+      <h2>{selectedEntry ? "Group" : "Add Group"}</h2>
       <div style={{ display: "flex", alignItems: "center" }}>
-        <input
-          type="text"
-          placeholder="Group Name"
-          value={inputText}
-          onChange={handleGroupInputChange}
-          style={{ flex: 1, padding: "5px" }}
-        />
-        <button
-          onClick={handleAddGroup}
-          style={{
-            marginLeft: "10px", // Add spacing between the input and button
-            padding: "5px 10px", // Add padding to the button
-            backgroundColor: "#007bff", // Example background color
-            color: "white", // Example text color
-            border: "none",
-            cursor: "pointer",
-          }}
-        >
-          Add Group
-        </button>
+        {selectedEntry ? (
+          <div>
+            <div>
+              <p>Name: {selectedEntry.group.name}</p>
+              <p>Users:</p>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Appearance</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {selectedEntry.group.users.map((user, index) => (
+                    <tr key={index}>
+                      <td>{user.user.firstName + " " + user.user.lastName}</td>
+                      <td className="centered-column">
+                        <Switch
+                          checked={user.absence}
+                          onChange={() => handleToggleSwitch(index)}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div style={{ marginTop: 10 }}>
+              <button onClick={() => handleEditEntry()}>Edit Entry </button>
+              <button onClick={() => handleDeleteEntry(selectedEntry.id)}>
+                Delete Entry
+              </button>{" "}
+            </div>
+          </div>
+        ) : (
+          // Display add form
+          <div>
+            <input
+              type="text"
+              placeholder="Group Name"
+              value={inputText}
+              onChange={handleGroupInputChange}
+              style={{ flex: 1, padding: "5px" }}
+            />
+            <button onClick={handleOpenEntry} className="button">
+              Add Group
+            </button>
+          </div>
+        )}
       </div>
       <div>
         {groupSuggestions.length > 0 && (

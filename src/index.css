@@ -17,7 +17,7 @@ body {
 p {
   margin: 20px 0;
 }
-button {
+.button {
   border: 0;
   padding: 8px;
   margin-bottom: 5px;
@@ -280,4 +280,9 @@ label {
 
 .suggestions li:hover {
   background-color: var(--primary); /* Change background color on hover */
+}
+
+.centered-column {
+  text-align: center;
+  vertical-align: middle;
 }

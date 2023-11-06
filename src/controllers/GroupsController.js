@@ -21,8 +21,7 @@ export async function GetAllGroupsAsync() {
   }
 }
 
-export async function GetGroupByIdAsync(id) {
-  const ref = doc(db, collectionName, id);
+export async function GetGroupByIdAsync(ref) {
 
   try {
     const refDpc = await getDoc(ref);
