@@ -1,4 +1,4 @@
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
 
 export async function CreateAbsenceAsync(queryData) {
@@ -14,3 +14,20 @@ export async function CreateAbsenceAsync(queryData) {
     throw error;
   }
 }
+
+
+export async function GetRefAbsenceAsync(ref) {
+    try {
+      const docSnapshot = await getDoc(ref);
+      if (docSnapshot.exists()) {
+        return { id: docSnapshot.id, ...docSnapshot.data() };
+      } else {
+        console.log("Referenced document does not exist.");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error fetching referenced document:", error);
+      return null;
+    }
+  }
+  

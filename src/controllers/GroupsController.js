@@ -76,8 +76,7 @@ export async function GetRefGroupAsync(ref) {
   try {
     const docSnapshot = await getDoc(ref);
     if (docSnapshot.exists()) {
-      const data = docSnapshot.data();
-      return new Group({ id: docSnapshot.id, ...data });
+      return new Group({ id: docSnapshot.id, ...docSnapshot.data() });
     } else {
       console.log("Referenced document does not exist.");
       return null;

@@ -15,6 +15,7 @@ import { Entries } from "../entities/EntriesEntity";
 import { GetRefUserAsync } from "./UserController";
 import { GetGroupByIdAsync } from "./GroupsController";
 import { CreateAbsenceAsync } from "./AbsenceController";
+import { EntriesDto } from "../objectDTOs/EntriesDto";
 
 
 const collectionName = "entries";
@@ -64,12 +65,11 @@ export async function GetAllEntriesFromDateAndArenaAsyc(arena, datetime) {
 
     const querySnapshot = await getDocs(q);
 
-    const entries = [];
-    querySnapshot.forEach((doc) => {
+    const entries = querySnapshot.docs.map((doc) => {
       const entryData = doc.data();
-      const entry = new Entries({ id: doc.id, ...entryData });
-      entries.push(entry);
+      return new EntriesDto({ id: doc.id, ...entryData });
     });
+
     return entries;
   } catch (error) {
     console.error("Error fetching Entries:", error);
