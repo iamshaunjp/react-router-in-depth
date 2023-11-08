@@ -1,12 +1,12 @@
-import { collection, addDoc, getDoc } from "firebase/firestore";
+
+import { collection, addDoc, getDoc, doc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
 
 export async function CreateAbsenceAsync(queryData) {
   try {
     
     const absenceListRef = collection(db, "absence");
-    const newDocRef = await addDoc(absenceListRef, { users: queryData });
-
+    const newDocRef = await addDoc(absenceListRef, { array: queryData });
     console.log("Absence Table created successfully.");
     return newDocRef;
   } catch (error) {
@@ -15,6 +15,17 @@ export async function CreateAbsenceAsync(queryData) {
   }
 }
 
+export async function UpdateAbsenceAsync(id, queryData) {
+  try {
+    const dataDocRef = doc(db, "absence", id);
+    await updateDoc(dataDocRef, queryData);
+
+    console.log("Absence document updated successfully");
+  } catch (error) {
+    console.error("Error updating entry data:", error);
+    throw error;
+  }
+}
 
 export async function GetRefAbsenceAsync(ref) {
     try {

@@ -4,11 +4,11 @@ import { GetAllGroupsAsync } from "../controllers/GroupsController";
 import {
   CreateEntryAsync,
   DeleteEntryAsync,
-  UpdateEntryAsync,
 } from "../controllers/EntriesController";
+import { UpdateAbsenceAsync } from "../controllers/AbsenceController";
+
 import { db } from "../firebase";
 import { doc } from "firebase/firestore";
-import {Entries} from "../entities/EntriesEntity";
 
 const customStyles = {
   content: {
@@ -87,34 +87,27 @@ const AddGroupModal = ({ isOpen, onRequestClose, arena, time, entry }) => {
     setSelectedOption(option);
   };
 
-  const handleEditEntry = () => {};
+  const handleUpdateEntry = async () => {
+    const updatedData = {
+      ...selectedEntry.group.absence.array.map((user) => {
+        return { user: doc(db, "users", user.user.id), absence: user.absence };
+      }),
+    };
+    await UpdateAbsenceAsync(selectedEntry.group.absence.id, {array: [updatedData]});
 
-  const handleDeleteEntry = (id) => {
-    DeleteEntryAsync(id);
+  };
+
+  const handleDeleteEntry = async (id) => {
+    await DeleteEntryAsync(id);
     onRequestClose();
   };
 
   const handleToggleSwitch = async (index) => {
     const updatedEntry = { ...selectedEntry };
-    updatedEntry.group.users[index].absence = !updatedEntry.group.users[index].absence;
-  
-    const entryId = selectedEntry.id;
-  
-    const updatedData = {
-        group: {
-          users: updatedEntry.group.users,
-        },
-      };
-  
-    try {
-      await UpdateEntryAsync(entryId, updatedData); 
-      setSelectedEntry(updatedEntry);
-      console.log("Database updated successfully");
-    } catch (error) {
-      console.error("Error updating the database:", error);
-    }
+    updatedEntry.group.absence.array[index].absence =
+      !updatedEntry.group.absence.array[index].absence;
+    setSelectedEntry(updatedEntry);
   };
-  
 
   const handleOpenEntry = () => {
     Promise.all([
@@ -144,8 +137,10 @@ const AddGroupModal = ({ isOpen, onRequestClose, arena, time, entry }) => {
       <div style={{ display: "flex", alignItems: "center" }}>
         {selectedEntry ? (
           <div>
+            {console.log(selectedEntry)}
+
             <div>
-              <p>Name: {selectedEntry.group.name}</p>
+              <p>Name: {selectedEntry.group.group.name}</p>
               <p>Users:</p>
               <table>
                 <thead>
@@ -155,7 +150,7 @@ const AddGroupModal = ({ isOpen, onRequestClose, arena, time, entry }) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {selectedEntry.group.users.map((user, index) => (
+                  {selectedEntry.group.absence.array.map((user, index) => (
                     <tr key={index}>
                       <td>{user.user.firstName + " " + user.user.lastName}</td>
                       <td className="centered-column">
@@ -170,7 +165,7 @@ const AddGroupModal = ({ isOpen, onRequestClose, arena, time, entry }) => {
               </table>
             </div>
             <div style={{ marginTop: 10 }}>
-              <button onClick={() => handleEditEntry()}>Edit Entry </button>
+              <button onClick={() => handleUpdateEntry()}>Update Entry </button>
               <button onClick={() => handleDeleteEntry(selectedEntry.id)}>
                 Delete Entry
               </button>{" "}

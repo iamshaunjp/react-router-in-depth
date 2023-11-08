@@ -11,7 +11,6 @@ import {
 } from "firebase/firestore";
 import { db, entriesCollection } from "../firebase";
 
-import { Entries } from "../entities/EntriesEntity";
 import { GetRefUserAsync } from "./UserController";
 import { GetGroupByIdAsync } from "./GroupsController";
 import { CreateAbsenceAsync } from "./AbsenceController";
@@ -64,13 +63,14 @@ export async function GetAllEntriesFromDateAndArenaAsyc(arena, datetime) {
     );
 
     const querySnapshot = await getDocs(q);
-
-    const entries = querySnapshot.docs.map((doc) => {
+    const entriesSnap = querySnapshot.docs.map((doc) => {
       const entryData = doc.data();
       return new EntriesDto({ id: doc.id, ...entryData });
     });
 
-    return entries;
+    const promises = entriesSnap.map(async (data) => data);
+    const results = await Promise.all(promises);
+    return results;
   } catch (error) {
     console.error("Error fetching Entries:", error);
     throw error;
@@ -111,8 +111,6 @@ export async function CreateEntryAsync(queryData) {
         absence: false,
       };
     }));
-
-    console.log(absenceData);
 
     const absenceRef = await CreateAbsenceAsync(absenceData);
 

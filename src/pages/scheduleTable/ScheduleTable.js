@@ -3,9 +3,6 @@ import DatePicker from "react-datepicker"; // Import the DatePicker component
 import "react-datepicker/dist/react-datepicker.css";
 import { GetAllArenasAsync } from "../../controllers/ArenasController";
 import { GetAllEntriesFromDateAndArenaAsyc } from "../../controllers/EntriesController";
-import { GetRefGroupAsync } from "../../controllers/GroupsController";
-import { GetRefArenaAsync } from "../../controllers/ArenasController";
-import { Entries } from "../../entities/EntriesEntity";
 import AddGroupModal from "../../components/GroupPopUpBox";
 import HoursEnum from "../../enums/TimeScheduleEnum";
 
@@ -14,12 +11,13 @@ import { Arena } from "../../objectDTOs/ArenasDto";
 
 const ScheduleTable = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selectedTime, setSelectedTime] = useState("");
+  const [selectedTime, setSelectedTime] = useState(null);
   const [fetchArena, setFetchArena] = useState([]);
-  const [selectedArena, setSelectedArena] = useState("");
+  const [selectedArena, setSelectedArena] = useState(null);
   const [entries, setEntries] = useState([]);
   const [selectedEntry, setSelectedEntry] = useState();
   const [isAddGroupModalOpen, setIsAddGroupModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Track loading state
 
   const timeSlots = Array.from(
     { length: HoursEnum.HOUR_23 - HoursEnum.HOUR_9 + 1 },
@@ -43,25 +41,19 @@ const ScheduleTable = () => {
   }, []);
 
   useEffect(() => {
-    const fetchEntries = async () => {
-      try {
-        const entriesSnap = await GetAllEntriesFromDateAndArenaAsyc(
-          selectedArena,
-          selectedDate
-        );
-
-        const promises = entriesSnap.map(async (data) => {
-          return data;
+    if (selectedArena !== null && selectedDate !== null) {
+      GetAllEntriesFromDateAndArenaAsyc(selectedArena, selectedDate)
+        .then((data) => {
+          setEntries(data);
+        })
+        .catch((error) => {
+          setError(error);
+          setEntries([]);
+        })
+        .finally(() => {
+          setIsLoading(false);
         });
-
-        const results = await Promise.all(promises);
-        setEntries(results);
-      } catch (error) {
-        setError(error);
-      }
-    };
-
-    fetchEntries();
+    }
   }, [selectedArena, selectedDate]);
 
   const handleArenaChange = (e) => {
@@ -82,8 +74,11 @@ const ScheduleTable = () => {
     setIsAddGroupModalOpen(true);
   };
 
+
   return (
     <div className="ScheduleTableContainer">
+      {console.log(entries)}
+      
       <h2>Schedule Table</h2>
       <div className="calendar-and-table">
         <div className="calendar-and-arena">
@@ -134,6 +129,17 @@ const ScheduleTable = () => {
                     item.datetime.toDate().getHours() ===
                     new Date(timeSlot).getHours()
                     );
+
+                let groupName = "";
+
+                if (matchingEntry) {
+                  if (matchingEntry.group.group.name) {
+                    groupName = matchingEntry.group.group.name;
+                  } else {
+                    groupName = "..."; // Display "Loading..." if the name is not available
+                  }
+                }
+
                 return (
                   <tr key={index} onClick={() => handleRowClick(timeSlot, matchingEntry)}>
                     <td>
@@ -142,7 +148,7 @@ const ScheduleTable = () => {
                         minute: "2-digit",
                       })}
                     </td>
-                    <td>{matchingEntry ? matchingEntry.group.name : ""}</td>
+                    <td>{groupName}</td>
                   </tr>
                 );
               })}
